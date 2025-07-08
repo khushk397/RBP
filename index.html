@@ -1,1 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Builder Pro</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">Resume<span>Builder</span>Pro</div>
+            <nav>
+                <ul>
+                    <li><a href="#builder">Build</a></li>
+                    <li><a href="#formats">Formats</a></li>
+                    <li><a href="#tips">Tips</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Create a Professional Resume in Minutes</h1>
+            <p>Our free resume builder helps you create the perfect resume for your dream job. Choose from standard formats and customize with ease.</p>
+            <a href="#builder" class="cta-button">Build Your Resume Now</a>
+        </div>
+    </section>
+
+    <section id="builder" class="resume-builder">
+        <div class="container">
+            <h2 class="section-title">Resume Builder</h2>
+            <div class="builder-container">
+                <div class="form-section">
+                    <form id="resumeForm">
+                        <div class="form-tabs">
+                            <button type="button" class="btn active" onclick="showTab('personal')">Personal</button>
+                            <button type="button" class="btn" onclick="showTab('education')">Education</button>
+                            <button type="button" class="btn" onclick="showTab('experience')">Experience</button>
+                            <button type="button" class="btn" onclick="showTab('skills')">Skills</button>
+                        </div>
+
+                        <div id="personal-tab" class="form-tab active">
+                            <h3 class="section-title">Personal Details</h3>
+                            <div class="form-group">
+                                <label for="firstName">First Name</label>
+                                <input type="text" id="firstName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Last Name</label>
+                                <input type="text" id="lastName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone</label>
+                                <input type="tel" id="phone">
+                            </div>
+                            <div class="form-group">
+                                <label for="address">Address</label>
+                                <textarea id="address"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="summary">Professional Summary</label>
+                                <textarea id="summary" placeholder="Briefly describe your professional background and skills"></textarea>
+                            </div>
+                        </div>
+
+                        <div id="education-tab" class="form-tab" style="display: none;">
+                            <h3 class="section-title">Education</h3>
+                            <div class="dynamic-form-elements" id="education-fields"></div>
+                            <button type="button" class="btn" onclick="addEducationField()">Add Education</button>
+                        </div>
+
+                        <div id="experience-tab" class="form-tab" style="display: none;">
+                            <h3 class="section-title">Work Experience</h3>
+                            <div class="dynamic-form-elements" id="experience-fields"></div>
+                            <button type="button" class="btn" onclick="addExperienceField()">Add Experience</button>
+                        </div>
+
+                        <div id="skills-tab" class="form-tab" style="display: none;">
+                            <h3 class="section-title">Skills</h3>
+                            <div class="dynamic-form-elements" id="skills-fields"></div>
+                            <button type="button" class="btn" onclick="addSkillField()">Add Skill</button>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 20px;">
+                            <button type="button" class="btn btn-secondary" onclick="generateResume()">Generate Resume</button>
+                            <button type="button" class="btn" onclick="downloadPDF()">Download PDF</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="preview-section">
+                    <h3 class="section-title">Resume Preview</h3>
+                    <div class="resume-preview chronological-format" id="resumePreview">
+                        <div class="resume-header">
+                            <h2 id="previewName">Your Name</h2>
+                            <p id="previewContact">Email | Phone | Address</p>
+                        </div>
+                        
+                        <div class="resume-section">
+                            <h3>Professional Summary</h3>
+                            <p id="previewSummary">Experienced professional with a demonstrated history of working in the industry. Skilled in various areas with strong problem-solving abilities.</p>
+                        </div>
+                        
+                        <div class="resume-section" id="education">
+                            <h3>Education</h3>
+                            <div id="previewEducation"></div>
+                        </div>
+                        
+                        <div class="resume-section" id="experience">
+                            <h3>Work Experience</h3>
+                            <div id="previewExperience"></div>
+                        </div>
+                        
+                        <div class="resume-section" id="skills">
+                            <h3>Skills</h3>
+                            <div id="previewSkills"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="formats" class="templates">
+        <div class="container">
+            <h2 class="section-title">Resume Formats</h2>
+            <p>Choose the resume format that best suits your experience and career goals</p>
+            
+            <div class="template-grid">
+                <div class="template-card selected" data-format="chronological" onclick="selectFormat('chronological')">
+                    <div class="template-img" data-template-name="Chronological"></div>
+                    <div class="template-info">
+                        <h3>Chronological</h3>
+                        <p>Lists work history in reverse chronological order. Best for those with steady employment history.</p>
+                    </div>
+                </div>
+                
+                <div class="template-card" data-format="functional" onclick="selectFormat('functional')">
+                    <div class="template-img" data-template-name="Functional"></div>
+                    <div class="template-info">
+                        <h3>Functional</h3>
+                        <p>Focuses on skills and abilities rather than work history. Good for career changers or employment gaps.</p>
+                    </div>
+                </div>
+                
+                <div class="template-card" data-format="hybrid" onclick="selectFormat('hybrid')">
+                    <div class="template-img" data-template-name="Hybrid"></div>
+                    <div class="template-info">
+                        <h3>Hybrid</h3>
+                        <p>Combines chronological and functional formats. Highlights skills with work history.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="tips" class="templates" style="background-color: white;">
+        <div class="container">
+            <h2 class="section-title">Format Selection Tips</h2>
+            <div style="margin-top: 15px;">
+                <h3 style="font-size: 1.1rem; margin-bottom: 10px;">When to use each format:</h3>
+                <ul style="margin-left: 20px;">
+                    <li style="margin-bottom: 8px;"><strong>Chronological:</strong> Best with consistent work history in the same field.</li>
+                    <li style="margin-bottom: 8px;"><strong>Functional:</strong> Ideal for career changers or employment gaps.</li>
+                    <li style="margin-bottom: 8px;"><strong>Hybrid:</strong> Good for highlighting both skills and career progression.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div class="container">
+            <p>&copy; 2023 ResumeBuilderPro. All rights reserved.</p>
+            <p>Contact us: contact@resumebuilderpro.com</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
 
