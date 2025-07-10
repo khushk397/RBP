@@ -6,9 +6,10 @@
     <title>Resume Builder Pro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="light-mode">
     <header>
         <div class="container header-content">
             <div class="logo">Resume<span>Builder</span>Pro</div>
@@ -20,6 +21,7 @@
                     <li><a href="#contact">Contact</a></li>
                 </ul>
             </nav>
+            <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
         </div>
     </header>
 
@@ -48,27 +50,36 @@
                             <h3 class="section-title">Personal Details</h3>
                             <div class="form-group">
                                 <label for="firstName">First Name</label>
-                                <input type="text" id="firstName" required>
+                                <input type="text" id="firstName" placeholder="e.g., John" required>
                             </div>
                             <div class="form-group">
                                 <label for="lastName">Last Name</label>
-                                <input type="text" id="lastName" required>
+                                <input type="text" id="lastName" placeholder="e.g., Doe" required>
                             </div>
                             <div class="form-group">
                                 <label for="email">Email</label>
-                                <input type="email" id="email" required>
+                                <input type="email" id="email" placeholder="e.g., john.doe@example.com" required>
                             </div>
                             <div class="form-group">
                                 <label for="phone">Phone</label>
-                                <input type="tel" id="phone">
+                                <input type="tel" id="phone" placeholder="e.g., (123) 456-7890">
+                            </div>
+                            <div class="form-group">
+                                <label for="linkedin">LinkedIn URL</label>
+                                <input type="url" id="linkedin" placeholder="e.g., https://linkedin.com/in/johndoe">
+                            </div>
+                            <div class="form-group">
+                                <label for="github">GitHub/Portfolio</label>
+                                <input type="url" id="github" placeholder="e.g., https://github.com/johndoe">
                             </div>
                             <div class="form-group">
                                 <label for="address">Address</label>
-                                <textarea id="address"></textarea>
+                                <textarea id="address" placeholder="City, State"></textarea>
                             </div>
                             <div class="form-group">
                                 <label for="summary">Professional Summary</label>
-                                <textarea id="summary" placeholder="Briefly describe your professional background and skills"></textarea>
+                                <textarea id="summary" placeholder="Briefly describe your professional background, skills, and achievements. Try to quantify results when possible (e.g., 'Increased sales by 30%')."></textarea>
+                                <small class="suggestion" id="summarySuggestion"></small>
                             </div>
                         </div>
 
@@ -90,37 +101,39 @@
                             <button type="button" class="btn" onclick="addSkillField()">Add Skill</button>
                         </div>
 
-                        <div class="form-group" style="margin-top: 20px;">
-                            <button type="button" class="btn btn-secondary" onclick="generateResume()">Generate Resume</button>
-                            <button type="button" class="btn" onclick="downloadPDF()">Download PDF</button>
+                        <div class="form-group form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="generateResume()">Update Preview</button>
+                            <button type="button" class="btn" onclick="downloadPDF()" id="pdfButton">Download PDF</button>
+                            <button type="button" class="btn btn-share" onclick="generateShareLink()">Share Link</button>
                         </div>
                     </form>
                 </div>
 
                 <div class="preview-section">
-                    <h3 class="section-title">Resume Preview</h3>
+                    <h3 class="section-title">Resume Preview <small>(Drag sections to reorder)</small></h3>
                     <div class="resume-preview chronological-format" id="resumePreview">
                         <div class="resume-header">
                             <h2 id="previewName">Your Name</h2>
-                            <p id="previewContact">Email | Phone | Address</p>
+                            <p id="previewContact">Email | Phone | LinkedIn</p>
+                            <p id="previewAddress"></p>
                         </div>
                         
-                        <div class="resume-section">
+                        <div class="resume-section" id="summary-section">
                             <h3>Professional Summary</h3>
                             <p id="previewSummary">Experienced professional with a demonstrated history of working in the industry. Skilled in various areas with strong problem-solving abilities.</p>
                         </div>
                         
-                        <div class="resume-section" id="education">
+                        <div class="resume-section" id="education-section">
                             <h3>Education</h3>
                             <div id="previewEducation"></div>
                         </div>
                         
-                        <div class="resume-section" id="experience">
+                        <div class="resume-section" id="experience-section">
                             <h3>Work Experience</h3>
                             <div id="previewExperience"></div>
                         </div>
                         
-                        <div class="resume-section" id="skills">
+                        <div class="resume-section" id="skills-section">
                             <h3>Skills</h3>
                             <div id="previewSkills"></div>
                         </div>
@@ -163,15 +176,22 @@
         </div>
     </section>
 
-    <section id="tips" class="templates" style="background-color: white;">
+    <section id="tips" class="templates">
         <div class="container">
             <h2 class="section-title">Format Selection Tips</h2>
-            <div style="margin-top: 15px;">
-                <h3 style="font-size: 1.1rem; margin-bottom: 10px;">When to use each format:</h3>
-                <ul style="margin-left: 20px;">
-                    <li style="margin-bottom: 8px;"><strong>Chronological:</strong> Best with consistent work history in the same field.</li>
-                    <li style="margin-bottom: 8px;"><strong>Functional:</strong> Ideal for career changers or employment gaps.</li>
-                    <li style="margin-bottom: 8px;"><strong>Hybrid:</strong> Good for highlighting both skills and career progression.</li>
+            <div class="tips-content">
+                <h3>When to use each format:</h3>
+                <ul>
+                    <li><strong>Chronological:</strong> Best with consistent work history in the same field.</li>
+                    <li><strong>Functional:</strong> Ideal for career changers or employment gaps.</li>
+                    <li><strong>Hybrid:</strong> Good for highlighting both skills and career progression.</li>
+                </ul>
+                
+                <h3>Pro Tips:</h3>
+                <ul>
+                    <li>Use action verbs (e.g., "Developed", "Led", "Optimized")</li>
+                    <li>Quantify achievements when possible (e.g., "Increased revenue by 30%")</li>
+                    <li>Keep it to 1 page for <5 years experience, 2 pages for more</li>
                 </ul>
             </div>
         </div>
@@ -179,10 +199,20 @@
 
     <footer id="contact">
         <div class="container">
-            <p>&copy; 2023 ResumeBuilderPro. All rights reserved.</p>
+            <p>&copy; <span id="currentYear"></span> ResumeBuilderPro. All rights reserved.</p>
             <p>Contact us: contact@resumebuilderpro.com</p>
         </div>
     </footer>
+
+    <div class="modal" id="shareModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h3>Share Your Resume</h3>
+            <p>Copy this link to share your resume:</p>
+            <input type="text" id="shareLink" readonly>
+            <button class="btn" onclick="copyShareLink()">Copy Link</button>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
